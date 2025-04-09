@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Traffic Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding-top: 20px;
+            background-color: #f3f3f3;
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            width: 100%;
+        }
+        input[type="number"]:invalid {
+            border-color: rgb(0, 0, 0);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #007bff; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease; 
+        }
+        button:hover {
+            background-color: #0056b3; 
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Network Traffic Prediction</h1>
+    <form id="predictionForm">
+        <div class="form-grid">
+            <!-- All form fields included here -->
+            <div class="form-group">
+                <label for="tcp_srcport">TCP Source Port</label>
+                <input type="number" id="tcp_srcport" name="tcp_srcport" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_dstport">TCP Destination Port</label>
+                <input type="number" id="tcp_dstport" name="tcp_dstport" required>
+            </div>
+            <div class="form-group">
+                <label for="ip_proto">IP Protocol</label>
+                <input type="number" id="ip_proto" name="ip_proto" required>
+            </div>
+            <div class="form-group">
+                <label for="frame_len">Frame Length</label>
+                <input type="number" id="frame_len" name="frame_len" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_flags_syn">TCP Flags SYN</label>
+                <input type="number" id="tcp_flags_syn" name="tcp_flags_syn" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_flags_reset">TCP Flags RESET</label>
+                <input type="number" id="tcp_flags_reset" name="tcp_flags_reset" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_flags_push">TCP Flags PUSH</label>
+                <input type="number" id="tcp_flags_push" name="tcp_flags_push" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_flags_ack">TCP Flags ACK</label>
+                <input type="number" id="tcp_flags_ack" name="tcp_flags_ack" required>
+            </div>
+            <div class="form-group">
+                <label for="ip_flags_mf">IP Flags MF</label>
+                <input type="number" id="ip_flags_mf" name="ip_flags_mf" required>
+            </div>
+            <div class="form-group">
+                <label for="ip_flags_df">IP Flags DF</label>
+                <input type="number" id="ip_flags_df" name="ip_flags_df" required>
+            </div>
+            <div class="form-group">
+                <label for="ip_flags_rb">IP Flags RB</label>
+                <input type="number" id="ip_flags_rb" name="ip_flags_rb" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_seq">TCP Sequence</label>
+                <input type="number" id="tcp_seq" name="tcp_seq" required>
+            </div>
+            <div class="form-group">
+                <label for="tcp_ack">TCP Acknowledgment</label>
+                <input type="number" id="tcp_ack" name="tcp_ack" required>
+            </div>
+            <div class="form-group">
+                <label for="packets">Packets</label>
+                <input type="number" id="packets" name="packets" required>
+            </div>
+            <div class="form-group">
+                <label for="bytes">Bytes</label>
+                <input type="number" id="bytes" name="bytes" required>
+            </div>
+            <div class="form-group">
+                <label for="tx_packets">Tx Packets</label>
+                <input type="number" id="tx_packets" name="tx_packets" required>
+            </div>
+            <div class="form-group">
+                <label for="tx_bytes">Tx Bytes</label>
+                <input type="number" id="tx_bytes" name="tx_bytes" required>
+            </div>
+            <div class="form-group">
+                <label for="rx_packets">Rx Packets</label>
+                <input type="number" id="rx_packets" name="rx_packets" required>
+            </div>
+            <div class="form-group">
+                <label for="rx_bytes">Rx Bytes</label>
+                <input type="number" id="rx_bytes" name="rx_bytes" required>
+            </div>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="loadingMessage" class="loading" style="display: none;">Submitting...</div>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    document.getElementById('predictionForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Show loading message
+        document.getElementById('loadingMessage').style.display = 'block';
+
+        const formData = {
+            "tcp.srcport": parseInt(document.getElementById('tcp_srcport').value),
+            "tcp.dstport": parseInt(document.getElementById('tcp_dstport').value),
+            "ip.proto": parseInt(document.getElementById('ip_proto').value),
+            "frame.len": parseInt(document.getElementById('frame_len').value),
+            "tcp.flags.syn": parseInt(document.getElementById('tcp_flags_syn').value),
+            "tcp.flags.reset": parseInt(document.getElementById('tcp_flags_reset').value),
+            "tcp.flags.push": parseInt(document.getElementById('tcp_flags_push').value),
+            "tcp.flags.ack": parseInt(document.getElementById('tcp_flags_ack').value),
+            "ip.flags.mf": parseInt(document.getElementById('ip_flags_mf').value),
+            "ip.flags.df": parseInt(document.getElementById('ip_flags_df').value),
+            "ip.flags.rb": parseInt(document.getElementById('ip_flags_rb').value),
+            "tcp.seq": parseInt(document.getElementById('tcp_seq').value),
+            "tcp.ack": parseInt(document.getElementById('tcp_ack').value),
+            "Packets": parseInt(document.getElementById('packets').value),
+            "Bytes": parseInt(document.getElementById('bytes').value),
+            "Tx Packets": parseInt(document.getElementById('tx_packets').value),
+            "Tx Bytes": parseInt(document.getElementById('tx_bytes').value),
+            "Rx Packets": parseInt(document.getElementById('rx_packets').value),
+            "Rx Bytes": parseInt(document.getElementById('rx_bytes').value)
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+
+            // Hide loading message and show result
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('result').innerHTML = `
+                <strong>Predicted Class:</strong> ${result.predicted_class} <br>
+                <strong>Class Label:</strong> ${result.class_label}
+            `;
+        } catch (error) {
+            // Hide loading message and show error message
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('result').innerHTML = "An error occurred. Please try again.";
+            console.error("Error:", error);
+        }
+    });
+</script>
+
+</body>
+</html>

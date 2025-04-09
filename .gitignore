@@ -1,0 +1,36 @@
+# Python
+*.py[cod]
+__pycache__/
+*.so
+
+# Virtual Environment
+.venv/
+env/
+ENV/
+venv/
+env.bak/
+venv.bak/
+
+# DVC
+.dvc/
+.dvcignore
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Other
+.cache/
+
+source_dataset/
+models/
+mlruns/
+data/
+
+
